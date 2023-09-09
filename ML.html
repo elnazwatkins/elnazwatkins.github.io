@@ -51,7 +51,7 @@
 										<img src="images/ml/fig00.jpg" alt="" width="400" height=Auto/>
 										<img src="images/ml/fig01.jpg" alt="" width="400" height=Auto/>
 										<h6>Figure 1: Train and test split with a determined split date. The top image shows SWH time series before decomposition. </br>
-											The bottom image  dipicts the SWH residuals after removing its trend and seasonality components.</h6>
+											The bottom image  depicts the SWH residuals after removing its trend and seasonality components.</h6>
 									</span>
 								</section>
 								<section>
@@ -112,7 +112,7 @@
 									Combining all together, we have a stationary time series with new time and lag features added to it. Our cross-validation framework is also established. 
 									We will proceed by iteratively looping through the cross-validation folds to train our XGBoost model. In each iteration, we will evaluate the model's performance 
 									by computing the root mean squared error, and these scores will be stored in a designated list for every fold. We calculate the average score from all the folds, 
-									which then serves as the final evaluation metric for this model. Tte average score we got for this model using cross validation is about 36.73. We will provide 
+									which then serves as the final evaluation metric for this model. The average score we got for this model using cross validation is about 36.73. We will provide 
 									a more detailed explanation of this evaluation in the subsequent "Model Evaluation" section.
 									<section class="main special">
 										<span class="image main">
@@ -129,7 +129,7 @@
 								<p>
 									The test set that we initially set aside from the data, referred to as "future data," serves as an excellent representative dataset for evaluating 
 									the performance of our model. Crucially, our model did not encounter this data during its training phase. We use the model to generate SWH forecasts 
-									for this dataset, which represent the timeframe after 01/01/2023 00:00. It's important to note that when making predictions, we must concatinate the future/test data and  
+									for this dataset, which represent the timeframe after 01/01/2023 00:00. It's important to note that when making predictions, we must concatenate the future/test data and  
 									the training set, then recalculate the lags features.
 									<section class="main special">
 										<span class="image main">
@@ -153,11 +153,11 @@
 								<p>
 									To assess the effectiveness of this model, we employed the Mean Squared Error (MSE) as our evaluation metric. It's noteworthy that the entire future dataset we predicted 
 									is a span of around 6 months, even though our forecast horizon was 3 months. The computed MSE for the 6-month period stands at 64.11, while the MSE for the 3-month forecast period 
-									is 37.20. These calculations underscore the observation that as we extend further into the future, it becomes more challenging to predict accuratly.
+									is 37.20. These calculations underscore the observation that as we extend further into the future, it becomes more challenging to predict accurately.
 								</p>
 								<p>
 									Additionally, to set up a baseline for our error rate assessment, we conducted a comparison by generating predictions using values imported from the previous year for the same 3-month period. 
-									This baseline MSE error is 188.86 and our ML model performed a much better prediction with MSE od 37.20.
+									This baseline MSE error is 188.86 and our ML model performed a much better prediction with MSE of 37.20.
 								</p>
 
 								<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forcast/blob/main/4-Model_Training.ipynb" target=”_blank” class="icon brands fa-github alt"><span class="label">GitHub</span></a>  Python Code
