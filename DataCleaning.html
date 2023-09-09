@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Data Cleaning</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>Data Cleaning</h1>
+						<p>A Time Series Approach</p>
+					</header>
+				
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#header">Home</a></li>
+						<li><a href="index.html#intro">About Me</a></li>
+						<li><a href="index.html#portfolio">Portfolio</a></li>
+						<li><a href="index.html#skills">Skills</a></li>
+						<li><a href="index.html#experience">Experience</a></li>
+						<li><a href="ElnazJedariFathi_Resume.pdf">Resume</a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Content -->
+							<section id="content" class="main">
+								<section>
+									<p>
+										In this section, we focus on three steps of data cleaning and the corresponding Python code for this segment is available <a href="https://github.com/elnazfathi/Significant-Wave-Height-Forecast/blob/main/EDA.ipynb">here</a>.
+									</p>
+									<ul>
+										<li>Part I: Manage the Data Gaps</li>
+										<li>Part II: Handle Mising Values</li>
+										<li>Part III: Standardize the Datetime Index</li>
+									</ul>
+								</section>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/cleaning/fig01.jpg" alt="" width="400" height=Auto/>
+										<h6>Figure 1: Missing Values Matrix on the Whole Dataset</h6>
+									</span>
+								</section>
+
+								<h2>Analyze missing values</h2>
+								<p>
+									Before we filter the data for the target station, we visualize the entire dataset's missing values to identify any eossible pattern within the data gaps.
+									As the missing values matrix in Figure 1 shows, the missing value patterns appear consistent for PeakPeriod, PeakDirection, UpcrossPeriod, and SWH variables. 
+									<a href="EDA.html#def">Definition</a> of these variables suggests that in the absence of recorded significant wave height (SWH), corresponding values would also be 
+									absent. Additionally, Hmax and THmax exhibit identical patterns, MeanCurDir and MeanCurSpd also follow the same missing data patterns, 
+									which is coherent considering their respective definitions too.
+								</p>
+								<p>
+									In EDA Section we discovered that there is no record for MeanCurDir, MeanCurSpd, and SeaTemp variables at the target station since these variables 
+									are recorded by an instrument distinct from the one employed at our target station. We also found in the heatmap that these variables 
+									do not have a significant correlation with the target variable SWH, therefore we do not consider it beneficial to incorporate them from the recorded stations into the target station data.
+									While we don't intend to use these variables for our training, we will retain them during the data cleaning process for future exploration.
+									Filtering the data to the target station changes the missing values matrix to Figure 2 for our target station.
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/cleaning/fig02.jpg" alt="" width="300" height=Auto/>
+										<h6>Figure 2: Missing Values Matrix for "AMETS Berth B Wave Buoy" station</h6>
+									</span>
+								</section>
+								<p>The dataset has about 500k entries for the selected station of which 1% are missing SWH and its associated features.aaaaa
+									Around 89% of the entire dataset's missing values within the variables Hmax and THmax.</p>
+
+								<h2>Part I: Manage The Data Gaps</h2>
+
+								<p>The missing values reported above do not include the three time periods during which data was not recorded. This is because 
+									for these gaps, there are no index rows present in the dataset; instead, we observe a noticeable jump in the datatime 
+									index column.</p>
+								<p>There are four missing time periods including: 
+									<ul>
+										<li>a 55 days period in 2020,</li>
+										<li>a 10 days period in 2020,</li>
+										<li>a 47 days period in 2022,</li>
+										<li>a 1 and a half days period in 2022.</li>
+									</ul>
+									The first data gap also occurred at the analogous station "AMETS Berth A Wave Buoy". However, the subsequent 
+									two data gaps is covered by recordings from the analogous "AMETS Berth A Wave Buoy" station, which we can utilize to 
+									address the missing data for our specific target station. Our strategies for handling these two instances of missing data are as follows: </br>
+									<ul>
+										<li>For 2020 12-days gap, we'll skip data to the end of this gap. We have a lot of data and the amount of data before this gap is very small (0.04% of data).</li>
+										<li>For 2022 48-days gap and 2-days gap, we'll build a machine learning model to predict missing values based on the values of the similar station.</li>
+									</ul>
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/cleaning/fig03.jpg" alt="" width="300" height=Auto/>
+										<h6>Figure 3: SWH at the target station vs. SWH at its similar  station. The two series are aligned with slight difference. </br> 
+											The missing periods are dispalyed by showing data only at the similar stations (blue line). Training a model to capture </br>
+											the difference between the two stations will give us a good estimate for the missing parts in the target station.</h6>
+									</span>
+								</section>
+								<p>A decision tree was employed for training, using the time series data from a comparable station. This approach enabled the model to effectively 
+									discern the patterns and variations between the two time series, leading to a predictions for the data gap in our target station. 
+									Figure 4, 5 and 6 visually depict the results, illustrating how the utilization of a machine learning technique offers a more robust solution 
+									for filling the missing gap compared to a straightforward import of values from the analogous station. </p>
+									
+								<p>Given that this model plays a relatively minor role in the project, specifically focused on filling the missing data gap, we opted for a broad 
+									prediction approach without diving into detailed model evaluation. A general assessment of the model's performance is depicted in the upcoming figures.</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/cleaning/fig04.jpg" alt="" width="300" height=Auto/>
+										<h6>Figure 4: Predicted SWH time series from similar station "AMETS Berth A Wave Buoy" time series. The predicted series captured the slight </br>
+											difference between the target station and its similar station and applied into its forecast.</h6>
+									</span>
+									<span class="image main">
+										<img src="images/cleaning/fig05.jpg" alt="" width="300" height=Auto/>
+										<h6>Figure 5: The image shows a prediction on a non-missing time period to present how well Predicted time series follows the target time series. </h6>
+									</span>
+									<span class="image main">
+										<img src="images/cleaning/fig06.jpg" alt="" width="300" height=Auto/>
+										<h6>Figure 6: The predicted time series tend to converge towards the mean value in regions where there are </br>
+											substantial difference between the target variable and the data from the similar station.</h6>
+									</span>
+								</section>
+								<p>We filled the gap for missing values in other variables using the same technique.</p>
+
+								<h2>Part II: Handle Missing Values</h2>
+								<p>
+									<strong>SWH and relevant features:</strong> We used linear interpolation to estimate the missing values in these variables. 
+									This approach allows us to maintain the temporal patterns present in the time series while also offering a statistically sound and reliable approximation for the gaps in our data.
+								</p>
+								<p>
+									<strong>Hmax and THmax:</strong> Hmax is the height of the highest wave and THmax is the period of the highest wave in seconds.
+									As previously mentioned, Hmax and THmax variables have missing values in approximately 89% of the available indexes. This discrepancy is due to the fact that the recording time 
+									intervals for these variables are larger compared to the recording interval for SWH. Figure 7 visualizes this fact.
+									<section class="main special">
+										<span class="image main">
+											<img src="images/cleaning/fig07.jpg" alt=""/>
+											<h6>Figure 7: SWH measurements are recorded approximately every 3 minutes, whereas Hmax measurements are taken at intervals of about 30 minutes.</h6>
+										</span>
+									</section>
+									<ul>
+										<li>For Hmax we employ the "ffill" method to fill in the missing values by using the most recent recorded value.</li>
+										<li>For THmax we employ the "fillna" method to fill in the missing vakues by 0. 
+											When there's no record for THmax, 
+											it implies that no new Hmax value was recorded within that period. Thus, assigning a time period of 0 is a sensible representation of this scenario.</li>
+									</ul>
+								</p>
+
+								<h2>Part III: Standardize the Datetime Index</h2>
+								<p>In this section, our objective is to achieve the following goals for the time series datetime index:
+									<ol>
+										<li>Transform the index into an evenly spaced arrangement.</li>
+										<li>Ensure that the newly created evenly spaced index does not contain any missing values.</li>
+									</ol>
+								</p>
+								<p>For approximately 98% of the dataset's entries, the time intervals follow a recurring pattern of (3, 3, 4) minutes. 
+									To standardize the index values, a logical resampling size of 10 minutes (3 + 3 + 4) has been selected. By generating 
+									this new index with a frequency of 10 minutes, about 5360 (3%) new missing values are introduced in each variable 
+									across the dataset. It's important to note that no resampling aggregation method is employed; rather we just kept the data recorded every 10 minutes.
+								</p>
+								<p>After analyzing the frequency of consecutive new null values introduced by reindexing, we've determined that a significant portion of these instances do not occur consecutively. 
+									In fact, majority of them involve two consecutive null values (30 minutes delay). Given this observation, we've decided to apply the same linear interpolation 
+									(for SWH and its relevant features), ffill (for Hmax), and fillna (for THmax) techniques that we previously utilized to fill these missing values.
+									Concluding this section, we have an evenly spaced dataset with 10 minutes frequency and no missing value.
+								</p>
+								<p>
+									In the <a href="Stationarity.html">next section</a> we'll take a look at out time series outliers and stationarity.
+								</p>
+								<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forecast/blob/main/2-Data_Cleaning.ipynb" class="icon brands fa-github alt"><span class="label">GitHub</span></a>  Python Code
+
+
+								
+
+						
+								<!--	
+								<p>Concluding this section, we save the cleaned dataset, which will be imported later for the model creation phase.</p>	
+								-->
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+
+					<section>
+						<h2>Contact</h2>
+						<dl class="alt">
+							<dt>Email</dt>
+							<dd>elnazfathi@gmail.com</dd>
+							<dt>Location</dt>
+							<dd>Liberty Hill, TX 78642 &bull; USA</dd>
+						</dl>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/elnazjedarifathi/" class="icon brands fa-linkedin alt"><span class="label">Linkedin</span></a></li>
+							<li><a href="https://github.com/elnazfathi" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+						</ul>
+					</section>
+					<p class="copyright">&copy; 2023. Elnaz Jedari Fathi. All Rights Reserved.</br>
+					Design by <a href="https://html5up.net/stellar">HTML5 UP</a></p>
+				</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

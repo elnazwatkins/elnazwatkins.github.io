@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Exploratory Data Analysis</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>Exploratory Data Analysis</h1>
+						<p>A Time Series Analysis</p>
+					</header>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#header">Home</a></li>
+						<li><a href="index.html#intro">About Me</a></li>
+						<li><a href="index.html#portfolio">Portfolio</a></li>
+						<li><a href="index.html#skills">Skills</a></li>
+						<li><a href="index.html#experience">Experience</a></li>
+						<li><a href="ElnazJedariFathi_Resume.pdf">Resume</a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Content -->
+							<section id="content" class="main">
+								<p>This section explores a time series data extracted from an intelligent buoys network 
+									stationed along the Irish coastline available <a href="https://erddap.marine.ie/erddap/tabledap/IWaveBNetwork.html">here</a>. A smart buoy is a sensor-equipped buoy 
+									to collect marine and aquatic data. These buoys' measurements encompass various indicators 
+									linked to oceanic conditions, encompassing parameters such as sea temperature, wave height, 
+									and sea water velocity. The complete Python code is available <a href="https://github.com/elnazfathi/Significant-Wave-Height-Forecast/blob/main/EDA.ipynb">here</a>.</p>
+								<span class="image main"><img src="images/wave.jpg" alt="" /></span>
+								<h2>Contents</h2>
+								<ul>
+									<li>Loading The Data</li>
+									<li>Type Down-casting to Reduce Memory Usage</li>
+									<li>Feature Understanding</li>
+									<li>Target Variable</li>
+									<li>Correlation</li>
+									<li>Conclusion</li>
+								</ul>
+								<h2>Loading The Data</h2>
+								<p>The dataset include 14 columns and 1,845,100 rows. The data is recorded from January 2020 to July 2023. 
+									A concise overview of the content within each column is listed below (full column explanation is <a href="https://erddap.marine.ie/erddap/tabledap/IWaveBNetwork.html">here</a>)</br></p>
+									
+								<section id="def">
+									<p>
+										&emsp;<b>longitude</b>: distance east or west of the prime meridian</br>
+										&emsp;<b>latitude</b>: the measurement of distance north or south of the Equator</br>
+										&emsp;<b>time</b>: record detection time</br>
+										&emsp;<b>station_id</b>: station identifier</br>
+										&emsp;<b>instrument</b>: Name of used instrument</br>
+										&emsp;<b>PeakPeriod</b>: sea surface wave period at maximum density</br>
+										&emsp;<b>PeakDirection</b>: Sea surface wave direction</br>
+										&emsp;<b>UpcrossPeriod</b>: Sea surface wave period</br>
+										&emsp;<b>SignificantWaveHeight</b>: sea surface wave significant height</br>
+										&emsp;<b>SeaTemperature</b>: sea surface temperature</br>
+										&emsp;<b>Hmax</b>: Sea surface height of the highest wave</br>
+										&emsp;<b>THmax</b>: period of the highest wave</br>
+										&emsp;<b>MeanCurDirTo</b>: mean direction of the sea water velocity</br>
+										&emsp;<b>MeanCurSpeed</b>: mean sea water speed	
+									</p>
+								</section>
+								
+								<h2>Type Down-casting to Reduce Memory Usage</h2>
+								<p>This is a large dataset and it takes about 197MB of RAM. This amount is decreased to about 127 MB by down-casting the categorical variable types from string to category as well as some of the float64 variable types to float32.</p>
+								
+								<h2>Feature Understanding</h2>
+								<p>The dataset consists of records tied to 7 distinct stations. Every station is associated with a unique geographical location defined 
+									by its latitude and longitude coordinates. The image below illustrates the distribution of data records across these stations 
+									and further designates the instrument type employed by each station. Notably, in figure-1 the presence of a solitary bar for each station 
+									indicates that they exclusively utilize one of the two available instrument types.</br></br>
+									Using longitude on the X-axis and latitude on the Y-axis, we can also visualize the relative positions of the stations on the map.
+								</p>
+								
+								<section class="main special">
+									<span class="image main">
+										<img src="images/fig01.jpg" alt="" width="400" height=Auto/>
+										<h6>Figure 1: A dual-bar arrangement for each station. Each bar's color represents a unique instrument used at a station. </br>
+											The exclusive presence of orange or blue bars for each station emphasizes that a single instrument type is used per station.
+										</h6>
+									</span>
+									<span class="image main">
+										<img src="images/fig02.jpg" alt="" width="500" height=Auto/>
+										<h6>Figure2: Stations locations plotted from data vs. the actual map</h6>
+									</span>
+								</section>
+								<p>Moving forward, we determine whether the two instruments play distinct roles in recording various variables within the dataset. 
+									Upon grouping the data by instrument type, it becomes evident that the "SeaTemp," "MeanCurDirTo," and "MeanCurSpeed" variables 
+									are absent in "Datawell WaveRider MkIII" records. As a result, we can conclude that these features are exclusively recorded by 
+									the "Datawell WaveRider 4" instrument and at stations using this particular instrument.</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/fig03.jpg" alt="" width="400" height=Auto/>
+										<h6>Figure 3: Count of Records for Each Feature by Instrument</h6>
+									</span>
+								</section>
+									
+								<h2>Target Variable</h2>
+								<p>Our initial step involves plotting the historical "SWH" (Significant Wave Height) data for each station. These plots visualize 
+									a comprehensive understanding of the target variable behavior across different stations/locations.</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/fig04.jpg" alt="" width="10" height=Auto/>
+										<h6>Figure 4: Significant Wave Heigh (SWH) time series per station. Wave heights and the amount of recorded data for SWH is the highest in the first two stations. </br>
+											The first 3 stations are using the "Datawell WaveRider MkIII" instrument and the rest are using "Datawell WaveRider 4" instrument.</h6>
+									</span>
+								</section>
+								<p>"AMETS Berth B Wave Buoy" station stands out with the highest number of SWH recordings, 
+									totaling 490,836 records. "AMETS Berth A Wave Buoy" station also boasts a substantial 
+									count of recordings. However, the remaining stations exhibit an inconsistent and comparatively lower volume of significant SWH records.</p>
+								<p>Next, we'll zoom in and examine a one-month plot of the data to gain a more detailed perspective. 
+									 Hmax and SWH time series show an obvious alignment which is expected, as Hmax denotes the peak wave height within 
+									 the observed wave cycle, mirroring the behavior of SWH.</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/fig05.jpg" alt="" width="10" height=Auto/>
+										<h6>Figure 5: One-month representation of SWH (Significant Wave Height) alongside Hmax (Maximum Wave Height), both displaying a congruent trend. </h6>
+									</span>
+								 </section>
+
+								<h2>Correlations</h2>
+								<p>Feature correlations aids in understanding the data's internal structure, guiding decisions related to 
+									feature engineering and model selection.</br>
+									We visualize the correlation between features using a heat-map. By visualizing correlations, 
+									we can identify redundant or highly correlated variables. This helps in feature selection by choosing the most 
+									relevant variables while eliminating those that contribute similar information.</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/fig06.jpg" alt="" width="10" height=Auto/>
+										<h6>Figure 6: Heat-map provides a graphical representation of the correlation matrix, 
+											where each cell's color intensity </br>
+											corresponds to the strength and direction of the correlation between two variables. </h6>
+									</span>
+								</section>
+								<p>According to the heat-map:​
+									​<ul>
+										<li>The most correlated feature to the target variable SWH is Hmax with 0.98 value. </li>
+										<li>The next correlated feature is UpcrossPeriod with 0.78 value.</li>
+										<li>Hmax and UpcrossPeriod are highly correlated to each other with 0.74 value.</li>
+									</ul>
+								</p>
+
+								<h2>Conclusion</h2>
+								<p>The Exploratory Data Analysis (EDA) revealed valuable insights into the relationships and distributions 
+									in the data. The heat-map visualization further revealed interdependencies between variables, 
+									guiding us in feature selection and potential avenues for predictive modeling. 
+									As we move forward, the insights gained from this EDA phase will serve as a solid foundation 
+									for data cleaning, feature engineering, and subsequent forecast modeling, ensuring that our analysis is both 
+									informed and impactful.</p>
+								
+							
+							<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forecast/blob/main/1-EDA.ipynb" class="icon brands fa-github alt"><span class="label">GitHub</span></a>  Python Code
+						</section>
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+
+					<section>
+						<h2>Contact</h2>
+						<dl class="alt">
+							<dt>Email</dt>
+							<dd>elnazfathi@gmail.com</dd>
+							<dt>Location</dt>
+							<dd>Liberty Hill, TX 78642 &bull; USA</dd>
+						</dl>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/elnazjedarifathi/" class="icon brands fa-linkedin alt"><span class="label">Linkedin</span></a></li>
+							<li><a href="https://github.com/elnazfathi" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+						</ul>
+					</section>
+					<p class="copyright">&copy; 2023. Elnaz Jedari Fathi. All Rights Reserved.</br>
+						Design by <a href="https://html5up.net/stellar">HTML5 UP</a></p>
+				</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
