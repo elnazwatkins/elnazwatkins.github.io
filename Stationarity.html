@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Stationarity</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>Stationarity and Decomposition</h1>
+						<p>for Time Series</p>
+					</header>
+				
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#header">Home</a></li>
+						<li><a href="index.html#intro">About Me</a></li>
+						<li><a href="index.html#portfolio">Portfolio</a></li>
+						<li><a href="index.html#skills">Skills</a></li>
+						<li><a href="index.html#experience">Experience</a></li>
+						<li><a href="ElnazJedariFathi_Resume.pdf">Resume</a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Content -->
+							<section id="content" class="main">
+								<section>
+									<p>
+										In this section, we assess the stationarity of the data that has been cleaned and standardized in the previous section 
+                                        and decompose it into its trend, seasonal, and residual components. While we plan to retain the outliers for model training, 
+                                        we also explore and visualize them to gain a general overview and for potential future investigations.
+                                        The corresponding Python code for this segment is available 
+                                        <a href="https://github.com/elnazfathi/Significant-Wave-Height-Forcast/blob/main/3-Stationarity.ipynb">here</a>.
+									</p>
+                                    <h2>Contents</h2>
+									<ul>
+										<li>Outlier Exploration</li>
+										<li>Data Stationarity</li>
+									</ul>
+								</section>
+                                <h2>Outlier Exploration</h2>
+								<p>
+									Outliers have influence on the model training procedure, as the model could incorporate these outliers unless they are eliminated. 
+									Figure 1 provides a broad overview of outliers within the context of monthly and quarterly aggregated data.
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/stationarity/fig01.jpg" alt=""/>
+										<h6>Figure 1: Outliers overview.</h6>
+									</span>
+								</section>	
+								<p>	
+									The boxplots presented in Figure 1 offer an effective way of visualizing the underlying seasonality and trend patterns within the dataset which we will explore in the next section. 
+                                    While our time series exhibits outliers, these instances correspond to exceptionally high wave heights and appear unrelated to 
+									errors or undesired circumstances. Consequently, we have opted to allow our training model to incorporate these outliers. 
+									Nevertheless, we have retained the code responsible for detecting and eliminating outliers, preserving it for potential future explorations.
+								</p>
+							    <h2>Data Stationarity</h2>
+								<p>The importance of this step depends on the choice of our prediction model. While certain statistical models adeptly 
+									manage non-stationary data, the majority of machine learning models perform optimally with time series that exhibit 
+									stationarity, wherein both seasonality and trend components are eliminated. Since we intend to forecast this series 
+									using a machine learning methodology, this segment entails an assessment of the dataset's stationarity and removing any components that disrupt stationarity.
+								</p>
+								<p>An effective approach for assessing the stationarity of a series is through visualization. As depicted in Figure 8, 
+									the SWH series is presented for our target station across each year. Observing the graphs, it becomes apparent that 
+									the series experiences heigher fluctuations (higher standard deviation) during the initial and ending months of the year, 
+									during the cold seasons. Aside from this annual cyclic pattern, no distinct minor seasonal trends are evident in the plot. 
+									It's possible that there are more complex patterns of seasonality hidden within the dataset.
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/stationarity/fig02.jpg" alt=""/>
+										<img src="images/stationarity/fig03.jpg" alt=""/>
+										<img src="images/stationarity/fig04.jpg" alt=""/>
+										<h6>Figure 2: SWH presented for target station "AMETS Berth B Wave Buoy" across each year with different resampling size.</h6>
+									</span>
+								</section>
+								<p>
+									We examined different methodology to detect more seasonality componnet in the series including weekly, 29.5 days (moon cycle period),
+									monthly, and quarterly but we did not find any rithmic seasonality.
+									Among the methodologies that we experimented with, 
+									we can mention STL, seasonal_decompose, as well as ACF and PACF plots. Coding details of these efforts are available in my github.
+									We found satisfaction in utilizing the annual seasonal and trend components identified by STL (Seasonal-Trend Decomposition using Loess), 
+									given that it has yielded a successful prediction model for this project.
+								</p>	
+								<p>
+									To remove the yearly seasonal component, we applied the STL method to both the original dataset with a 10-minute interval and a resampled dataset with 1-hour frequency. 
+									The outcomes were almost identical for both cases. However, it's worth noting that the execution time for the STL method was significantly 
+									longer with the 10-minute interval data (6 times larger data size). Moreover, the performance of the machine learning model remained consistent regardless 
+									of the data frequency. Due to these observations, we opted to proceed with the 1-hour frequency for the duration of this project.
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/stationarity/fig05.jpg" alt=""/>
+										<img src="images/stationarity/fig06.jpg" alt=""/>
+										<h6>Figure 3: Seasonal, trend, and residual components. Once the seasonal and trend components have been eliminated, </br>
+											the residuals exhibit a random pattern, indicating that the series can now be considered stationary.
+										</h6>
+									</span>
+								</section>
+								<p>
+									As previously stated, we employed STL to break down our SWH time series. We conducted STL training over a yearly cycle, resulting in 
+									the identification of its trend, seasonal, and residual components, as depicted in figure 3. Ultimately, we will proceed to train an 
+									XGBoost model using the residuals, which appear to be random and stationarity.
+								</p>
+								<p>
+									In the <a href="ML.html">next section</a> you can read about the XGBoost model trained to forecast the future of the SWH time series.
+								</p>
+								<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forcast/blob/main/3-Stationarity.ipynb" class="icon brands fa-github alt"><span class="label">GitHub</span></a>  Python Code
+
+
+								
+
+						
+								<!--	
+								<p>Concluding this section, we save the cleaned dataset, which will be imported later for the model creation phase.</p>	
+								-->
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+
+					<section>
+						<h2>Contact</h2>
+						<dl class="alt">
+							<dt>Email</dt>
+							<dd>elnazfathi@gmail.com</dd>
+							<dt>Location</dt>
+							<dd>Liberty Hill, TX 78642 &bull; USA</dd>
+						</dl>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/elnazjedarifathi/" class="icon brands fa-linkedin alt"><span class="label">Linkedin</span></a></li>
+							<li><a href="https://github.com/elnazfathi" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+						</ul>
+					</section>
+					<p class="copyright">&copy; 2023. Elnaz Jedari Fathi. All Rights Reserved.</br>
+						Design by <a href="https://html5up.net/stellar">HTML5 UP</a></p>
+				</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

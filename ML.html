@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Machine Learning</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>Machine Learning</h1>
+						<p>An XGBoost Model for Time Series Forecast</p>
+					</header>
+				
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#header">Home</a></li>
+						<li><a href="index.html#intro">About Me</a></li>
+						<li><a href="index.html#portfolio">Portfolio</a></li>
+						<li><a href="index.html#skills">Skills</a></li>
+						<li><a href="index.html#experience">Experience</a></li>
+						<li><a href="ElnazJedariFathi_Resume.pdf">Resume</a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Content -->
+							<section id="content" class="main">
+								<p>
+									In this section, or focus is to train an XGBoost model for forecasting significant wave height time series. The corresponding code for this portion can be accessed 
+									<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forcast/blob/main/4-Model_Training.ipynb">here</a>.
+									In our time series analysis in <a href="stationarity.html">previous section</a>, we decomposed the SWH time series into its components (trend, seasonality, and residuals). We will apply machine learning to the stationary residuals, 
+									and the reconstruct the predictions by adding back the trend and seasonality components. This helps in isolationg the underlying patterns from the noise and variations.
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/ml/fig00.jpg" alt="" width="400" height=Auto/>
+										<img src="images/ml/fig01.jpg" alt="" width="400" height=Auto/>
+										<h6>Figure 1: Train and test split with a determined split date. The top image shows SWH time series before decomposition. </br>
+											The bottom image  dipicts the SWH residuals after removing its trend and seasonality components.</h6>
+									</span>
+								</section>
+								<section>
+									<h2>Contents</h2>
+									<ul>
+										<li>Train and test split</li>
+										<li>Time series cross validation</li>
+										<li>Forecasting Horizon</li>
+										<li>Feature Engineering</li>
+										<li>XGBoost Training</li>
+										<li>Predicting the future</li>
+										<li>Model Evaluation</li>
+									</ul>
+								</section>
+								
+
+								<h2>Train and Test Split</h2>
+								<p>
+									Splitting a time series dataset into train and test subsets requires careful consideration due to the time-based characteristics of the data. 
+									We choose "01/01/2023 00:00" as the boundary between the training and testing periods (figure 01). This test set will be employed to assess the model's performance 
+									and in this project we refer to it as "future" data. We'll train the model on the data before this division point using cross validation.
+								</p>
+								<h2>Time Series Cross Validation</h2>
+								<p>
+									We employ the TimeSeriesSplit class from the sklearn library for our cross validation splits. With the TimeSeriesSplit class, we can specify the maximum training size 
+									and the number of desired splits. The class will then generate the necessary cross-validation partitions for us.
+								</p>
+								<section class="main special">
+									<span class="image main">
+										<img src="images/ml/fig02.jpg" alt="" width="400" height=Auto/>
+										<h6>Figure 2: Train and test cross validations.</h6>
+									</span>
+								</section>
+
+								<h2>Forecasting Horizon</h2>
+								<p>
+									The forecast horizon refers to the specific time period into the future for which you are making predictions. The forecast horizon is an important parameter in time series forecasting, 
+									as it can impact the accuracy and reliability of your predictions. Longer forecast horizons might introduce more uncertainty and challenges, as it becomes harder to capture complex patterns 
+									and fluctuations the further into the future we try to predict. Our Forecast horizon here is <strong>3 months</strong>.
+									We also are restricted by lag features and we can't add lag features back further than our time horizon.
+								</p>
+
+								<h2>Feature Engineering</h2>
+								<p>
+									<ul>
+										<li>Time Features</li>
+										We create new features for our model to help it learn better. We extract the time components from the Datetime index and save them as new features in the dataset. 
+										These new features include: hour, day, quarter, month, year, day of year, and week. </br></br>
+										<li>Lag Features</li>
+										We also add some lag features which are are a form of feature engineering. A lag feature represents the value of a variable at a certain number of time steps before 
+									the current time step. For example, in our hourly SWH data we incorporate the SWH values for the previous year at the same time. 
+									As a result, our time step would be 24 times 365 hours in the past. 
+									The reason behind selecting this lag is rooted in the relative positions of the moon, earth, and sun has an impact on the tides, thereby affecting waves characteristics and their heights. 
+									After some trial and error we used 2 lags for our dataset: 1 year, and 2 years.
+									</ul>
+								</p>
+								<h2>XGBoost Training</h2>
+								<p>
+									Combining all together, we have a stationary time series with new time and lag features added to it. Our cross-validation framework is also established. 
+									We will proceed by iteratively looping through the cross-validation folds to train our XGBoost model. In each iteration, we will evaluate the model's performance 
+									by computing the root mean squared error, and these scores will be stored in a designated list for every fold. We calculate the average score from all the folds, 
+									which then serves as the final evaluation metric for this model. Tte average score we got for this model using cross validation is about 36.73. We will provide 
+									a more detailed explanation of this evaluation in the subsequent "Model Evaluation" section.
+									<section class="main special">
+										<span class="image main">
+											<img src="images/ml/fig03.jpg" alt="" width="400" height=Auto/>
+											<h6>Figure 3: Feature importance per XGBoost model.</h6>
+										</span>
+									</section>
+									An advantageous aspect of the XGBoost model is its ability to furnish feature importance values learned during its training. 
+									This is presented in figure 3, where we observe that the two lag features incorporated into the dataset stand out as the most influential attributes. 
+									After fine-tuning the parameters of our XGBoost model and being satisfied with its performance, we proceeded to train the model using the optimized 
+									parameters on the entire training dataset. As a result of this final training, we achieved an improved score of 29.67. 
+								</p>
+								<h2>Prediction the Test Set</h2>
+								<p>
+									The test set that we initially set aside from the data, referred to as "future data," serves as an excellent representative dataset for evaluating 
+									the performance of our model. Crucially, our model did not encounter this data during its training phase. We use the model to generate SWH forecasts 
+									for this dataset, which represent the timeframe after 01/01/2023 00:00. It's important to note that when making predictions, we must concatinate the future/test data and  
+									the training set, then recalculate the lags features.
+									<section class="main special">
+										<span class="image main">
+											<img src="images/ml/fig05.jpg" alt="" width="400" height=Auto/>
+											<h6>Figure 4: Reconstructed SWH prediction after adding back the trend and seasonality components.</h6>
+											<img src="images/ml/fig04.jpg" alt="" width="400" height=Auto/>
+											<h6>Figure 5: Stationary residual prediction.</h6>
+										</span>
+									</section>
+									As depicted in figure 4, the model's predictions showcase an impressive performance, adeptly capturing all significant fluctuations in the time series 
+									for approximately 3 months (our forecast horizon). As highlighted earlier, it's important to note that the accuracy of predictions tends to diminish the further we project 
+									into the future as it's visible in the picture too.</p>
+									<section class="main special">
+										<span class="image main">
+											<img src="images/ml/fig06.jpg" alt="" width="400" height=Auto/>
+											<h6>Figure 6: Predicted values on the Original SWH.</h6>
+										</span>
+									</section>
+
+								<h2>Model Evaluation</h2>
+								<p>
+									To assess the effectiveness of this model, we employed the Mean Squared Error (MSE) as our evaluation metric. It's noteworthy that the entire future dataset we predicted 
+									is a span of around 6 months, even though our forecast horizon was 3 months. The computed MSE for the 6-month period stands at 64.11, while the MSE for the 3-month forecast period 
+									is 37.20. These calculations underscore the observation that as we extend further into the future, it becomes more challenging to predict accuratly.
+								</p>
+								<p>
+									Additionally, to set up a baseline for our error rate assessment, we conducted a comparison by generating predictions using values imported from the previous year for the same 3-month period. 
+									This baseline MSE error is 188.86 and our ML model performed a much better prediction with MSE od 37.20.
+								</p>
+
+								<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forcast/blob/main/4-Model_Training.ipynb" class="icon brands fa-github alt"><span class="label">GitHub</span></a>  Python Code
+
+								<!--	
+								<p>Concluding this section, we save the cleaned dataset, which will be imported later for the model creation phase.</p>	
+								-->
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+
+					<section>
+						<h2>Contact</h2>
+						<dl class="alt">
+							<dt>Email</dt>
+							<dd>elnazfathi@gmail.com</dd>
+							<dt>Location</dt>
+							<dd>Liberty Hill, TX 78642 &bull; USA</dd>
+						</dl>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/elnazjedarifathi/" class="icon brands fa-linkedin alt"><span class="label">Linkedin</span></a></li>
+							<li><a href="https://github.com/elnazfathi" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+						</ul>
+					</section>
+					<p class="copyright">&copy; 2023. Elnaz Jedari Fathi. All Rights Reserved.></br>
+						Design by <a href="https://html5up.net/stellar">HTML5 UP</a></p>
+				</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
