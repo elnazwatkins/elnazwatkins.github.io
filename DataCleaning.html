@@ -46,7 +46,7 @@
 									</p>
 									<ul>
 										<li>Part I: Manage the Data Gaps</li>
-										<li>Part II: Handle Mising Values</li>
+										<li>Part II: Handle Missing Values</li>
 										<li>Part III: Standardize the Datetime Index</li>
 									</ul>
 								</section>
@@ -59,7 +59,7 @@
 
 								<h2>Analyze missing values</h2>
 								<p>
-									Before we filter the data for the target station, we visualize the entire dataset's missing values to identify any eossible pattern within the data gaps.
+									Before we filter the data for the target station, we visualize the entire dataset's missing values to identify any possible pattern within the data gaps.
 									As the missing values matrix in Figure 1 shows, the missing value patterns appear consistent for PeakPeriod, PeakDirection, UpcrossPeriod, and SWH variables. 
 									<a href="EDA.html#def">Definition</a> of these variables suggests that in the absence of recorded significant wave height (SWH), corresponding values would also be 
 									absent. Additionally, Hmax and THmax exhibit identical patterns, MeanCurDir and MeanCurSpd also follow the same missing data patterns, 
@@ -78,7 +78,7 @@
 										<h6>Figure 2: Missing Values Matrix for "AMETS Berth B Wave Buoy" station</h6>
 									</span>
 								</section>
-								<p>The dataset has about 500k entries for the selected station of which 1% are missing SWH and its associated features.aaaaa
+								<p>The dataset has about 500k entries for the selected station of which 1% are missing SWH and its associated features. 
 									Around 89% of the entire dataset's missing values within the variables Hmax and THmax.</p>
 
 								<h2>Part I: Manage The Data Gaps</h2>
@@ -105,7 +105,7 @@
 									<span class="image main">
 										<img src="images/cleaning/fig03.jpg" alt="" width="300" height=Auto/>
 										<h6>Figure 3: SWH at the target station vs. SWH at its similar  station. The two series are aligned with slight difference. </br> 
-											The missing periods are dispalyed by showing data only at the similar stations (blue line). Training a model to capture </br>
+											The missing periods are displayed by showing data only at the similar stations (blue line). Training a model to capture </br>
 											the difference between the two stations will give us a good estimate for the missing parts in the target station.</h6>
 									</span>
 								</section>
@@ -151,7 +151,7 @@
 									</section>
 									<ul>
 										<li>For Hmax we employ the "ffill" method to fill in the missing values by using the most recent recorded value.</li>
-										<li>For THmax we employ the "fillna" method to fill in the missing vakues by 0. 
+										<li>For THmax we employ the "fillna" method to fill in the missing values by 0. 
 											When there's no record for THmax, 
 											it implies that no new Hmax value was recorded within that period. Thus, assigning a time period of 0 is a sensible representation of this scenario.</li>
 									</ul>
