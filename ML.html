@@ -41,10 +41,10 @@
 						<!-- Content -->
 							<section id="content" class="main">
 								<p>
-									In this section, or focus is to train an XGBoost model for forecasting significant wave height time series. The corresponding code for this portion can be accessed 
+									In this section, our focus is to train an XGBoost model for forecasting significant wave height time series. The corresponding code for this section can be accessed 
 									<a href="https://github.com/elnazfathi/Significant-Wave-Height-Forcast/blob/main/4-Model_Training.ipynb">here</a>.
-									In our time series analysis in <a href="stationarity.html">previous section</a>, we decomposed the SWH time series into its components (trend, seasonality, and residuals). We will apply machine learning to the stationary residuals, 
-									and the reconstruct the predictions by adding back the trend and seasonality components. This helps in isolationg the underlying patterns from the noise and variations.
+									In our time series analysis in <a href="stationarity.html">previous section</a>, we decomposed the SWH time series into its components (trend, seasonality, and residuals) using STL model. We will apply machine learning to the stationary residuals, 
+									and then reconstruct the predictions by adding back the trend and seasonality components. This helps in isolationg the underlying patterns from the noise and variations.
 								</p>
 								<section class="main special">
 									<span class="image main">
@@ -58,11 +58,11 @@
 									<h2>Contents</h2>
 									<ul>
 										<li>Train and test split</li>
-										<li>Time series cross validation</li>
+										<li>Time series cross validation splits</li>
 										<li>Forecasting Horizon</li>
 										<li>Feature Engineering</li>
-										<li>XGBoost Training</li>
-										<li>Predicting the future</li>
+										<li>XGBoost Model Training</li>
+										<li>Prediction</li>
 										<li>Model Evaluation</li>
 									</ul>
 								</section>
@@ -74,7 +74,7 @@
 									We choose "01/01/2023 00:00" as the boundary between the training and testing periods (figure 01). This test set will be employed to assess the model's performance 
 									and in this project we refer to it as "future" data. We'll train the model on the data before this division point using cross validation.
 								</p>
-								<h2>Time Series Cross Validation</h2>
+								<h2>Time Series Cross Validation Splits</h2>
 								<p>
 									We employ the TimeSeriesSplit class from the sklearn library for our cross validation splits. With the TimeSeriesSplit class, we can specify the maximum training size 
 									and the number of desired splits. The class will then generate the necessary cross-validation partitions for us.
@@ -88,10 +88,9 @@
 
 								<h2>Forecasting Horizon</h2>
 								<p>
-									The forecast horizon refers to the specific time period into the future for which you are making predictions. The forecast horizon is an important parameter in time series forecasting, 
-									as it can impact the accuracy and reliability of your predictions. Longer forecast horizons might introduce more uncertainty and challenges, as it becomes harder to capture complex patterns 
-									and fluctuations the further into the future we try to predict. Our Forecast horizon here is <strong>3 months</strong>.
-									We also are restricted by lag features and we can't add lag features back further than our time horizon.
+									The forecast horizon refers to the specific time period into the future for which we are making predictions. The forecast horizon is an important parameter in time series forecasting, 
+									as it can impact the accuracy and reliability of our predictions. Longer forecast horizons might introduce more uncertainty and challenges, as it becomes harder to capture complex patterns 
+									and fluctuations the further into the future we try to predict. Our forecast horizon for this project is <strong>3 months</strong>.
 								</p>
 
 								<h2>Feature Engineering</h2>
@@ -101,14 +100,14 @@
 										We create new features for our model to help it learn better. We extract the time components from the Datetime index and save them as new features in the dataset. 
 										These new features include: hour, day, quarter, month, year, day of year, and week. </br></br>
 										<li>Lag Features</li>
-										We also add some lag features which are are a form of feature engineering. A lag feature represents the value of a variable at a certain number of time steps before 
+										We also add some lag features which are a form of feature engineering. A lag feature represents the value of a variable at a certain number of time steps before 
 									the current time step. For example, in our hourly SWH data we incorporate the SWH values for the previous year at the same time. 
 									As a result, our time step would be 24 times 365 hours in the past. 
 									The reason behind selecting this lag is rooted in the relative positions of the moon, earth, and sun has an impact on the tides, thereby affecting waves characteristics and their heights. 
 									After some trial and error we used 2 lags for our dataset: 1 year, and 2 years.
 									</ul>
 								</p>
-								<h2>XGBoost Training</h2>
+								<h2>XGBoost Model Training</h2>
 								<p>
 									Combining all together, we have a stationary time series with new time and lag features added to it. Our cross-validation framework is also established. 
 									We will proceed by iteratively looping through the cross-validation folds to train our XGBoost model. In each iteration, we will evaluate the model's performance 
@@ -124,9 +123,9 @@
 									An advantageous aspect of the XGBoost model is its ability to furnish feature importance values learned during its training. 
 									This is presented in figure 3, where we observe that the two lag features incorporated into the dataset stand out as the most influential attributes. 
 									After fine-tuning the parameters of our XGBoost model and being satisfied with its performance, we proceeded to train the model using the optimized 
-									parameters on the entire training dataset. As a result of this final training, we achieved an improved score of 29.67. 
+									parameters on the entire training dataset.
 								</p>
-								<h2>Prediction the Test Set</h2>
+								<h2>Prediction</h2>
 								<p>
 									The test set that we initially set aside from the data, referred to as "future data," serves as an excellent representative dataset for evaluating 
 									the performance of our model. Crucially, our model did not encounter this data during its training phase. We use the model to generate SWH forecasts 
